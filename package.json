@@ -1,10 +1,11 @@
 {
   "name": "bitly-client",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Access Bitly from the command line",
   "author": "Ildar Sagdejev <specious@gmail.com> (http://specious.github.io/)",
   "license": "MIT",
   "preferGlobal": true,
+  "bin": { "bitly-client": "index.js" },
   "keywords": [
     "bitly",
     "cli"
