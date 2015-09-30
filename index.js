@@ -30,7 +30,7 @@ var bitly = new Bitly( key )
 getBitlyHistory()
 
 function preValidateToken( token ) {
-  return typeof token === 'string' && token.length !== 0 && ( /^[0-9A-F]+$/i ).test( token )
+  return typeof token === 'string' && token.length !== 0 && ( /^[0-9a-f]+$/ ).test( token )
 }
 
 function getBitlyToken() {
