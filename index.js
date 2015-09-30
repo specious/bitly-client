@@ -38,7 +38,7 @@ function getBitlyToken() {
   print( "You can obtain your token from: " + "https://bitly.com/a/oauth_apps".yellow )
   print()
 
-  var key = readline.question('Token: ')
+  var key = readline.question( 'Token: ', { history: false } )
 
   print()
   print( "You can save your token to " + ("~/." + APP_NAME + "rc").yellow + " like this:" )
