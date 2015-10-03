@@ -35,7 +35,7 @@ function parseCount( n ) {
   n = parseInt( n )
 
   // Clamp input to range [0..Infinity]
-  return (n === undefined || isNaN(n)) ? Infinity : (n > 0 ? n : 0)
+  return isNaN(n) ? Infinity : (n > 0 ? n : 0)
 }
 
 function preValidateToken( token ) {
