@@ -3,6 +3,7 @@
 'use strict'
 
 const APP_NAME = 'bitly-client'
+const BITLY_MAX_HISTORY_CHUNK = 100
 
 var Bitly = require('bitly'),
     app = require('commander'),
@@ -15,6 +16,7 @@ require('colors')
 app
   .description( 'Access Bitly from the command line' )
   .option( '-v, --verbose', 'verbose output' )
+  .option( '-c, --count <n>', 'limit results', parseCount, Infinity )
   .parse( process.argv )
 
 var key = rc.key
@@ -27,7 +29,14 @@ if( !preValidateToken( key ) ) {
 }
 
 var bitly = new Bitly( key )
-getBitlyHistory()
+getLinkHistory()
+
+function parseCount( n ) {
+  n = parseInt( n )
+
+  // Clamp input to range [0..Infinity]
+  return (n === undefined || isNaN(n)) ? Infinity : (n > 0 ? n : 0)
+}
 
 function preValidateToken( token ) {
   return typeof token === 'string' && token.length !== 0 && ( /^[0-9a-f]+$/ ).test( token )
@@ -49,21 +58,25 @@ function getBitlyToken() {
   return key
 }
 
-function getBitlyHistory( offset, count ) {
+function getLinkHistory( offset ) {
   offset = offset || 0
-  count = count || 100
+  let count = Math.min( app.count, BITLY_MAX_HISTORY_CHUNK )
 
-  bitly._doRequest( bitly._generateNiceUrl( { offset, limit: count }, 'user/link_history' ) ).then( res => {
-    printHistory( res.data.link_history )
+  if( count !== 0 ) {
+    app.count -= count
 
-    if( offset + count < res.data.result_count )
-      getBitlyHistory( offset + count, count )
-  } ).catch( err => {
-    print( (err.toString() + " (code: " + err.code + ")").red )
-  } )
+    bitly._doRequest( bitly._generateNiceUrl( { offset, limit: count }, 'user/link_history' ) ).then( res => {
+      printLinkHistory( res.data.link_history )
+
+      if( offset + count < res.data.result_count )
+        getLinkHistory( offset + count )
+    } ).catch( err => {
+      print( (err.toString() + " (code: " + err.code + ")").red )
+    } )
+  }
 }
 
-function printHistory( link_history ) {
+function printLinkHistory( link_history ) {
   for( let item of link_history ) {
     //
     // Print short link and long URL
@@ -81,9 +94,9 @@ function printHistory( link_history ) {
       if( item.title !== "" )
         print( INDENT + item.title.replace(/(\r\n|\n|\r)/gm, "") )
       if( item.tags.length !== 0 )
-        print( INDENT + 'Tags: '.red + item.tags.join( ', ' ).yellow )
+        print( INDENT + 'Tags: '.red + item.tags.join(', ').yellow )
 
-      print( INDENT + 'Created: '.red + new Date( item.created_at * 1000 ) + "\n" )
+      print( INDENT + 'Created: '.red + new Date(item.created_at * 1000) + "\n" )
     }
   }
 }
