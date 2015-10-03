@@ -17,11 +17,12 @@ app
   .description( 'Access Bitly from the command line' )
   .option( '-v, --verbose', 'verbose output' )
   .option( '-c, --count <n>', 'limit results', parseCount, Infinity )
+  .option( '--ask', 'ask for Bitly access token' )
   .parse( process.argv )
 
 var key = rc.key
 
-if( !preValidateToken( key ) ) {
+if( rc.ask || !preValidateToken( key ) ) {
   key = getBitlyToken()
 
   if( !preValidateToken( key ) )
