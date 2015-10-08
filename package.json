@@ -1,6 +1,6 @@
 {
   "name": "bitly-client",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Access Bitly from the command line",
   "author": "Ildar Sagdejev <specious@gmail.com> (http://specious.github.io/)",
   "license": "MIT",
@@ -16,7 +16,7 @@
   "bugs": "https://github.com/specious/bitly-client/issues",
   "repository": {
     "type": "git",
-    "url": "git://github.com/specious/bitly-client.git"
+    "url": "specious/bitly-client"
   },
   "dependencies": {
     "bitly": "^3.0.1",
