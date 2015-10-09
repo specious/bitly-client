@@ -7,9 +7,9 @@ const APP_NAME = 'bitly-client',
 
 var Bitly = require('bitly'),
     app = require('commander'),
-    readline = require('readline-sync'),
     rc = require('rc')(APP_NAME),
     url = require('url'),
+    read = require('read'),
     print = console.log.bind( console )
 
 require('colors')
@@ -58,9 +58,9 @@ app
   .arguments( '[arg]' )
   .parse( process.argv )
 
-var key = rc.key, action = history
-
-let arg = app.args[0]
+var bitly,
+    action = history,
+    arg = app.args[0]
 
 if( arg ) {
   if( checkURI( arg ) ) {
@@ -76,12 +76,11 @@ if( arg ) {
     action = function() { expand( arg ) }
 }
 
-if( app.ask || !preValidateToken( key ) )
-  key = askBitlyToken()
+getBitlyToken().then( key => {
+  bitly = new Bitly( key )
 
-var bitly = new Bitly( key )
-
-action()
+  action()
+} )
 
 function checkURI( s ) {
   // URI validator by Diego Perini:
@@ -100,20 +99,25 @@ function preValidateToken( token ) {
   return typeof token === 'string' && token.length !== 0 && ( /^[0-9a-f]+$/ ).test( token )
 }
 
-function askBitlyToken() {
-  print( "Please enter your Bitly access token." )
-  print( "You can obtain your token from: " + "https://bitly.com/a/oauth_apps".yellow )
-  print()
+function getBitlyToken() {
+  return new Promise( function( resolve ) {
+    if( app.ask || !preValidateToken( rc.key ) ) {
+      print( "Please enter your Bitly access token." )
+      print( "You can obtain your token from: " + "https://bitly.com/a/oauth_apps".yellow )
+      print()
 
-  var key = readline.question( 'Token: ', { history: false } )
+      read( { prompt: "Token: " }, function( err, key ) {
+        print()
+        print( "You can save your token to " + ("~/." + APP_NAME + "rc").yellow + " like this:" )
+        print()
+        print( ("{ \"key\": \"" + key + "\" }").yellow )
+        print()
 
-  print()
-  print( "You can save your token to " + ("~/." + APP_NAME + "rc").yellow + " like this:" )
-  print()
-  print( ("{ \"key\": \"" + key + "\" }").yellow )
-  print()
-
-  return key
+        resolve( key )
+      } )
+    } else
+      resolve( rc.key )
+  } )
 }
 
 function printError( error ) {
