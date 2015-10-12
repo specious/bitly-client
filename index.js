@@ -120,8 +120,9 @@ function getBitlyToken() {
   } )
 }
 
-function printError( error ) {
+function error( error ) {
   print( (error.toString() + " (code: " + error.code + ")").red )
+  process.exit( 1 )
 }
 
 function expand( shortUrl ) {
@@ -129,7 +130,7 @@ function expand( shortUrl ) {
     let ret = res.data.expand[0]
     print( (ret.short_url ? ret.short_url.yellow + " > " : "") + ret.long_url.yellow )
   } ).catch( e => {
-    printError( e )
+    error( e )
   } )
 }
 
@@ -137,7 +138,7 @@ function shorten( longUrl, preferredDomain ) {
   bitly.shorten( longUrl, preferredDomain ).then( res => {
     print( res.data.url.yellow )
   } ).catch( e => {
-    printError( e )
+    error( e )
   } )
 }
 
@@ -154,7 +155,7 @@ function history( offset ) {
       if( offset + count < res.data.result_count )
         history( offset + count )
     } ).catch( e => {
-      printError( e )
+      error( e )
     } )
   }
 }
