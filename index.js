@@ -80,7 +80,7 @@ getBitlyToken().then( key => {
   bitly = new Bitly( key )
 
   action()
-} )
+}, () => error() )
 
 function checkURI( s ) {
   // URI validator by Diego Perini:
@@ -100,28 +100,35 @@ function preValidateToken( token ) {
 }
 
 function getBitlyToken() {
-  return new Promise( function( resolve ) {
+  return new Promise( function( resolve, reject ) {
     if( app.ask || !preValidateToken( rc.key ) ) {
       print( "Please enter your Bitly access token." )
       print( "You can obtain your token from: " + "https://bitly.com/a/oauth_apps".yellow )
       print()
 
       read( { prompt: "Token: " }, function( err, key ) {
-        print()
-        print( "You can save your token to " + ("~/." + APP_NAME + "rc").yellow + " like this:" )
-        print()
-        print( ("{ \"key\": \"" + key + "\" }").yellow )
-        print()
+        if( key !== undefined ) {
+          print()
+          print( "You can save your token to " + ("~/." + APP_NAME + "rc").yellow + " like this:" )
+          print()
+          print( ("{ \"key\": \"" + key + "\" }").yellow )
+          print()
 
-        resolve( key )
+          resolve( key )
+        } else {
+          print()
+          reject()
+        }
       } )
     } else
       resolve( rc.key )
   } )
 }
 
-function error( error ) {
-  print( (error.toString() + " (code: " + error.code + ")").red )
+function error( e ) {
+  if( e )
+    print( (e + " (code: " + e.code + ")").red )
+
   process.exit( 1 )
 }
 
