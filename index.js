@@ -2,12 +2,12 @@
 
 'use strict'
 
-const APP_NAME = 'bitly-client',
-      BITLY_MAX_HISTORY_CHUNK = 100
+const BITLY_MAX_HISTORY_CHUNK = 100
 
-var Bitly = require('bitly'),
+var manifest = require('./package.json'),
+    Bitly = require('bitly'),
     app = require('commander'),
-    rc = require('rc')(APP_NAME),
+    rc = require('rc')(manifest.name),
     url = require('url'),
     read = require('read'),
     print = console.log.bind( console )
@@ -50,6 +50,7 @@ var domains = {
 }
 
 app
+  .version( manifest.version )
   .description( 'Access Bitly from the command line' )
   .option( '-v, --verbose', 'verbose output' )
   .option( '-c, --count <n>', 'limit results', parseCount, Infinity )
@@ -78,7 +79,6 @@ if( arg ) {
 
 getBitlyToken().then( key => {
   bitly = new Bitly( key )
-
   action()
 }, () => error() )
 
@@ -109,7 +109,7 @@ function getBitlyToken() {
       read( { prompt: "Token: " }, function( err, key ) {
         if( key !== undefined ) {
           print()
-          print( "You can save your token to " + ("~/." + APP_NAME + "rc").yellow + " like this:" )
+          print( "You can save your token to " + ("~/." + manifest.name + "rc").yellow + " like this:" )
           print()
           print( ("{ \"key\": \"" + key + "\" }").yellow )
           print()
