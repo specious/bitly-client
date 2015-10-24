@@ -1,6 +1,6 @@
 # bitly-client
 
-Access [Bitly](https://bitly.com/) from the command line
+Access [Bitly](https://bitly.com/) from the command line ([What is Bitly?](http://support.bitly.com/knowledgebase/articles/77224-what-is-bitly))
 
 ## Install
 
