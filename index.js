@@ -18,7 +18,8 @@ var domains = {
   default: [
     'bit.ly',
     'bitly.com',
-    'j.mp'],
+    'j.mp'
+  ],
   extended: [
     'www.j.mp',
     'bitly.is',
@@ -83,14 +84,16 @@ var bitly,
     arg = app.args[0]
 
 if( arg ) {
-  if( checkURI( arg ) ) {
-    let u = url.parse( arg )
+  let uri = validateURI( arg )
+
+  if( uri ) {
+    let u = url.parse( uri )
 
     // If the URL is a Bitly URL, then make a request to expand it
     if( domains.default.indexOf( u.hostname ) !== -1 || domains.extended.indexOf( u.hostname ) !== -1 ) {
-        action = function() { expand( arg ) }
+        action = function() { expand( uri ) }
     } else {
-      action = function() { shorten( arg, app.domain ) }
+      action = function() { shorten( uri, app.domain ) }
     }
   } else
     action = function() { expand( arg ) }
@@ -101,10 +104,23 @@ getBitlyToken().then( key => {
   action()
 }, () => error() )
 
-function checkURI( s ) {
+function isQualifiedURI( s ) {
   // URI validator by Diego Perini:
   //   https://gist.github.com/dperini/729294
   return /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$/i.test( s )
+}
+
+function validateURI( s ) {
+  if( isQualifiedURI( s ) ) {
+    return s
+  } else {
+    s = 'http://' + s
+
+    if( isQualifiedURI( s ) )
+      return s
+    else
+      return null
+  }
 }
 
 function parseCount( n ) {
@@ -154,7 +170,7 @@ function error( e ) {
 function expand( shortUrl ) {
   bitly.expand( shortUrl ).then( res => {
     let ret = res.data.expand[0]
-    print( (ret.short_url ? ret.short_url.yellow + " > " : "") + ret.long_url.yellow )
+    print( (ret.short_url ? ret.short_url : "http://bit.ly/" + ret.hash ).yellow + " > " + ret.long_url.yellow )
   } ).catch( e => {
     error( e )
   } )
