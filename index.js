@@ -103,7 +103,14 @@ if( arg ) {
 getBitlyToken().then( key => {
   bitly = new Bitly( key )
   action()
-}, () => error() )
+}, () => abort() )
+
+function abort( e ) {
+  if( e )
+    print( (e.code ? e + " (code: " + e.code + ")" : e).red )
+
+  process.exit( 1 )
+}
 
 function isQualifiedURI( s ) {
   // URI validator by Diego Perini:
@@ -183,19 +190,12 @@ function getBitlyToken() {
   } )
 }
 
-function error( e ) {
-  if( e )
-    print( (e + " (code: " + e.code + ")").red )
-
-  process.exit( 1 )
-}
-
 function expand( shortUrl ) {
   bitly.expand( shortUrl ).then( res => {
     let ret = res.data.expand[0]
     print( (ret.short_url ? ret.short_url : "http://bit.ly/" + ret.hash ).yellow + " > " + ret.long_url.yellow )
   } ).catch( e => {
-    error( e )
+    abort( e )
   } )
 }
 
@@ -203,7 +203,7 @@ function shorten( longUrl, preferredDomain ) {
   bitly.shorten( longUrl, preferredDomain ).then( res => {
     print( res.data.url.yellow )
   } ).catch( e => {
-    error( e )
+    abort( e )
   } )
 }
 
@@ -220,7 +220,7 @@ function history( offset ) {
       if( offset + count < res.data.result_count )
         history( offset + count )
     } ).catch( e => {
-      error( e )
+      abort( e )
     } )
   }
 }
@@ -238,7 +238,7 @@ function printHistory( link_history ) {
     // Print more details (if --verbose)
     //
     if( app.verbose ) {
-      const INDENT = '     ';
+      const INDENT = '     '
 
       if( item.title !== "" )
         print( INDENT + item.title.replace(/(\r\n|\n|\r)/gm, "") )
