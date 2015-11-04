@@ -75,6 +75,7 @@ app
   .option( '-v, --verbose', 'verbose output' )
   .option( '-c, --count <n>', 'limit results', parseCount, Infinity )
   .option( '--ask', 'ask for Bitly access token' )
+  .option( '--save', 'save Bitly access token (use with --ask)' )
   .option( '--domain [value]', 'preferred Bitly domain for shortening: ' + domains.default.join(', ') )
   .arguments( '[arg]' )
   .parse( process.argv )
@@ -130,6 +131,25 @@ function parseCount( n ) {
   return isNaN(n) ? Infinity : (n > 0 ? n : 0)
 }
 
+function getConfigFilePath() {
+  return (process.platform === "win32" ?
+            process.env.USERPROFILE : process.env.HOME)
+              + "/." + manifest.name + "rc"
+}
+
+function saveConfig( key ) {
+  let fs = require('fs'),
+      file = getConfigFilePath()
+
+  try {
+    fs.writeFileSync( file, 'key = ' + key )
+    return file
+  } catch( e ) {
+    print( e.toString().red )
+    return null
+  }
+}
+
 function preValidateToken( token ) {
   return typeof token === 'string' && token.length !== 0 && ( /^[0-9a-f]+$/ ).test( token )
 }
@@ -142,16 +162,19 @@ function getBitlyToken() {
       print()
 
       read( { prompt: "Token: " }, function( err, key ) {
+        print()
         if( key !== undefined ) {
-          print()
-          print( "You can save your token to " + ("~/." + manifest.name + "rc").yellow + " like this:" )
-          print()
-          print( ("{ \"key\": \"" + key + "\" }").yellow )
-          print()
+          if( app.save || !rc.key ) {
+            let file = saveConfig( key )
+
+            if( file ) {
+              print( "Key has been saved to: " + file.yellow )
+              print()
+            }
+          }
 
           resolve( key )
         } else {
-          print()
           reject()
         }
       } )
