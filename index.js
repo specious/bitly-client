@@ -74,8 +74,9 @@ app
   .description( 'Access Bitly from the command line' )
   .option( '-v, --verbose', 'verbose output' )
   .option( '-c, --count <n>', 'limit results', parseCount, Infinity )
-  .option( '--ask', 'ask for Bitly access token' )
-  .option( '--save', 'save Bitly access token (use with --ask)' )
+  .option( '--key <key>', 'provide a Bitly access token', String )
+  .option( '--ask', 'ask for Bitly access token (overrides --key)' )
+  .option( '--save', 'save Bitly access token (use with --key or --ask)' )
   .option( '--domain [value]', 'preferred Bitly domain for shortening: ' + domains.default.join(', ') )
   .arguments( '[arg]' )
   .parse( process.argv )
@@ -103,7 +104,7 @@ if( arg ) {
 getBitlyToken().then( key => {
   bitly = new Bitly( key )
   action()
-}, () => abort() )
+}, ( err ) => abort( err ) )
 
 function abort( e ) {
   if( e )
@@ -150,20 +151,24 @@ function saveConfig( key ) {
 
   try {
     fs.writeFileSync( file, 'key = ' + key )
-    return file
+    print( "Key has been saved to: " + file.yellow )
   } catch( e ) {
     print( e.toString().red )
-    return null
   }
+
+  print()
 }
 
+//
+// Preliminary sanity check (not full validation)
+//
 function preValidateToken( token ) {
   return typeof token === 'string' && token.length !== 0 && ( /^[0-9a-f]+$/ ).test( token )
 }
 
 function getBitlyToken() {
   return new Promise( function( resolve, reject ) {
-    if( app.ask || !preValidateToken( rc.key ) ) {
+    if( app.ask || (!app.key && !preValidateToken( rc.key )) ) {
       print( "Please enter your Bitly access token." )
       print( "You can obtain your token from: " + "https://bitly.com/a/oauth_apps".yellow )
       print()
@@ -171,22 +176,27 @@ function getBitlyToken() {
       read( { prompt: "Token: " }, function( err, key ) {
         print()
         if( key !== undefined ) {
-          if( app.save || !rc.key ) {
-            let file = saveConfig( key )
-
-            if( file ) {
-              print( "Key has been saved to: " + file.yellow )
-              print()
-            }
-          }
+          // Save the key if there isn't one saved already, or if --save option is passed
+          if( app.save || !rc.key )
+            saveConfig( key )
 
           resolve( key )
         } else {
           reject()
         }
       } )
-    } else
+    } else if( app.key ) {
+      if( !preValidateToken( app.key ) ) {
+        reject( 'The authentication token you have provided does not appear to be valid' )
+      } else {
+        if( app.save )
+          saveConfig( app.key )
+
+        resolve( app.key )
+      }
+    } else {
       resolve( rc.key )
+    }
   } )
 }
 
@@ -227,16 +237,12 @@ function history( offset ) {
 
 function printHistory( link_history ) {
   for( let item of link_history ) {
-    //
-    // Print short link and long URL
-    //
+    // Print short and long URL
     print( ':: ' +
       ((item.keyword_link === undefined) ? item.link : item.keyword_link).yellow +
       ' - ' + item.long_url.red )
 
-    //
-    // Print more details (if --verbose)
-    //
+    // Print additional details (if --verbose)
     if( app.verbose ) {
       const INDENT = '     '
 
