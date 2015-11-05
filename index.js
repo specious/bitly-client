@@ -65,7 +65,8 @@ var domains = {
     'engt.co',
     'd3w.io',
     'bzfd.it',
-    'apne.ws'
+    'apne.ws',
+    'shebpr.es'
   ]
 }
 
