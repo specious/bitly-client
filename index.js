@@ -75,12 +75,16 @@ app
   .description( 'Access Bitly from the command line' )
   .option( '-v, --verbose', 'verbose output' )
   .option( '-c, --count <n>', 'limit results', parseCount, Infinity )
+  .option( '-<n>', 'limit results (same as --count <n>)' )
   .option( '--key <key>', 'provide a Bitly access token', String )
   .option( '--ask', 'ask for Bitly access token (overrides --key)' )
   .option( '--save', 'save Bitly access token (use with --key or --ask)' )
   .option( '--domain [value]', 'preferred Bitly domain for shortening: ' + domains.default.join(', ') )
   .arguments( '[arg]' )
+  .allowUnknownOption()
   .parse( process.argv )
+
+applyAltCount( app.rawArgs )
 
 var bitly,
     action = history,
@@ -138,6 +142,20 @@ function parseCount( n ) {
 
   // Clamp input to range [0..Infinity]
   return isNaN(n) ? Infinity : (n > 0 ? n : 0)
+}
+
+//
+// Let last occurring -<n> arg override any passed --count
+//
+function applyAltCount( args ) {
+  for( let i = args.length - 1; i >= 0; i-- ) {
+    let arg = args[i], rest = arg.slice( 1 )
+
+    if( arg[0] === "-" && /^\d+$/.test( rest ) ) {
+      app.count = parseInt( rest )
+      break
+    }
+  }
 }
 
 function getConfigFilePath() {
