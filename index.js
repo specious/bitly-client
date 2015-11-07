@@ -79,7 +79,7 @@ app
   .option( '--key <key>', 'provide a Bitly access token', String )
   .option( '--ask', 'ask for Bitly access token (overrides --key)' )
   .option( '--save', 'save Bitly access token (use with --key or --ask)' )
-  .option( '--domain [value]', 'preferred Bitly domain for shortening: ' + domains.default.join(', ') )
+  .option( '--domain <value>', 'preferred Bitly domain for shortening: ' + domains.default.join(', ') )
   .arguments( '[arg]' )
   .allowUnknownOption()
   .parse( process.argv )
