@@ -8,6 +8,7 @@ var manifest = require('./package.json'),
     Bitly = require('bitly'),
     app = require('commander'),
     rc = require('rc')(manifest.name),
+    homedir = require('os').homedir(),
     url = require('url'),
     read = require('read'),
     print = console.log.bind( console )
@@ -158,15 +159,9 @@ function applyAltCount( args ) {
   }
 }
 
-function getConfigFilePath() {
-  return (process.platform === "win32" ?
-            process.env.USERPROFILE : process.env.HOME)
-              + "/." + manifest.name + "rc"
-}
-
 function saveConfig( key ) {
   let fs = require('fs'),
-      file = getConfigFilePath()
+      file = homedir + "/." + manifest.name + "rc"
 
   try {
     fs.writeFileSync( file, 'key = ' + key )
