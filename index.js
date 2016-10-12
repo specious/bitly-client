@@ -67,7 +67,8 @@ var domains = {
     'd3w.io',
     'bzfd.it',
     'apne.ws',
-    'shebpr.es'
+    'shebpr.es',
+    'b-gat.es'
   ]
 }
 
@@ -106,7 +107,7 @@ if( app.archive ) {
   if( uri ) {
     let u = url.parse( uri )
 
-    // If the URL is a Bitly URL, then make a request to expand it
+    // If the URL is a bitlink, then send a request to expand it
     if( domains.default.indexOf( u.hostname ) !== -1 || domains.extended.indexOf( u.hostname ) !== -1 ) {
       action = function() { expand( uri ) }
     } else {
@@ -129,7 +130,7 @@ function abort( e ) {
 }
 
 function isQualifiedURI( s ) {
-  // URI validator by Diego Perini:
+  // Small but effective URI validator by Diego Perini:
   //   https://gist.github.com/dperini/729294
   return /^(?:(?:https?|ftp):\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#]\S*)?$/i.test( s )
 }
@@ -183,7 +184,7 @@ function saveConfig( key ) {
 }
 
 //
-// Preliminary sanity check (not full validation)
+// Brief sanity check (not full validation)
 //
 function preValidateToken( token ) {
   return typeof token === 'string' && token.length !== 0 && ( /^[0-9a-f]+$/ ).test( token )
@@ -277,7 +278,7 @@ function history( offset ) {
 
 function printHistory( link_history ) {
   for( let item of link_history ) {
-    // Print short and long URL
+    // Print bitlink followed by original URL
     print( ':: ' +
       ((item.keyword_link === undefined) ? item.link : item.keyword_link).yellow +
       ' - ' + item.long_url.red )
