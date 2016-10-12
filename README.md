@@ -36,6 +36,12 @@ Look up the long url for a bitlink:
 bitly-client http://bit.ly/1WOyimn
 ```
 
+Archive a bitlink ([what does that mean?](http://support.bitly.com/knowledgebase/articles/154192-how-do-i-delete-a-bitlink)):
+
+```
+bitly-client -a http://bit.ly/1WOyimn
+```
+
 ## License
 
 Licensed under the [MIT License](http://en.wikipedia.org/wiki/MIT_License)

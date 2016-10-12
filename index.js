@@ -77,6 +77,7 @@ app
   .option( '-v, --verbose', 'verbose output' )
   .option( '-c, --count <n>', 'limit results', parseCount, Infinity )
   .option( '-<n>', 'limit results (same as --count <n>)' )
+  .option( '-a, --archive', 'archive the following bitlink' )
   .option( '--key <key>', 'provide a Bitly access token', String )
   .option( '--ask', 'ask for Bitly access token (overrides --key)' )
   .option( '--save', 'save Bitly access token (use with --key or --ask)' )
@@ -91,7 +92,15 @@ var bitly,
     action = history,
     arg = app.args[0]
 
-if( arg ) {
+if( app.archive ) {
+  if( arg ) {
+    if( !validateURI( arg ) )
+      arg = 'http://bit.ly/' + arg
+
+    action = function() { archive( arg ) }
+  } else
+    process.exit( 0 )
+} else if( arg ) {
   let uri = validateURI( arg )
 
   if( uri ) {
@@ -99,7 +108,7 @@ if( arg ) {
 
     // If the URL is a Bitly URL, then make a request to expand it
     if( domains.default.indexOf( u.hostname ) !== -1 || domains.extended.indexOf( u.hostname ) !== -1 ) {
-        action = function() { expand( uri ) }
+      action = function() { expand( uri ) }
     } else {
       action = function() { shorten( uri, app.domain ) }
     }
@@ -231,6 +240,23 @@ function shorten( longUrl, preferredDomain ) {
   } )
 }
 
+function archive( shortUrl ) {
+  bitly.linkEdit( 'archived', shortUrl, 'true' ).then( res => {
+    print( 'Archived: ' + res.data.link_edit.link.yellow )
+  } ).catch( e => {
+    switch( e.code ) {
+      case 400: // INVALID_ARG_LINK, which really means it exists but it's not yours
+        abort( shortUrl + " is not your bitlink" )
+        break
+      case 404: // NOT_FOUND
+        abort( shortUrl + " is not yet a bitlink" )
+        break
+      default:
+        abort( e )
+    }
+  } )
+}
+
 function history( offset ) {
   offset = offset || 0
   let count = Math.min( app.count, BITLY_MAX_HISTORY_CHUNK )
@@ -256,7 +282,7 @@ function printHistory( link_history ) {
       ((item.keyword_link === undefined) ? item.link : item.keyword_link).yellow +
       ' - ' + item.long_url.red )
 
-    // Print additional details (if --verbose)
+    // Print additional details (if "--verbose")
     if( app.verbose ) {
       const INDENT = '     '
 
