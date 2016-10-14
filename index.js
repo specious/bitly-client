@@ -107,7 +107,6 @@ getBitlyToken().then( key => {
 
   if( arg0 ) {
     for( var i = 0; i < app.args.length; i++ )
-      // print( app.args[i] )
       action( app.args[i] )
   } else {
     action()
@@ -238,9 +237,16 @@ function expandOrShorten( arg ) {
 function expand( shortUrl ) {
   bitly.expand( shortUrl ).then( res => {
     let ret = res.data.expand[0]
-    print( (ret.short_url ? ret.short_url : "http://bit.ly/" + ret.hash ).yellow + " > " + ret.long_url.yellow )
+
+    if( ret.error ) {
+      if( ret.error === "NOT_FOUND" )
+        print( shortUrl.grey + " is not yet a bitlink" )
+      else
+        warn( "error trying to expand " + shortUrl + ": " + ret.error )
+    } else
+      print( (ret.short_url ? ret.short_url : "http://bit.ly/" + ret.hash ).yellow + " > " + ret.long_url.yellow )
   } ).catch( e => {
-    abort( e )
+    warn( e )
   } )
 }
 
@@ -248,7 +254,7 @@ function shorten( longUrl, preferredDomain ) {
   bitly.shorten( longUrl, preferredDomain ).then( res => {
     print( res.data.url.yellow + " (" + longUrl.grey + ")" )
   } ).catch( e => {
-    abort( e )
+    warn( e )
   } )
 }
 
