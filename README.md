@@ -12,6 +12,12 @@ npm install -g bitly-client
 
 ## Usage
 
+```
+bitly-client --help
+```
+
+## Usage examples
+
 Retrieve all saved bitlinks (in reverse chronological order):
 
 ```
