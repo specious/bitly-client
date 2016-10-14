@@ -42,6 +42,12 @@ Archive a bitlink ([what does that mean?](http://support.bitly.com/knowledgebase
 bitly-client -a http://bit.ly/1WOyimn
 ```
 
+Pass multiple arguments:
+
+```
+bitly-client regexplained google-crash facts-about-money
+```
+
 ## License
 
 Licensed under the [MIT License](http://en.wikipedia.org/wiki/MIT_License)

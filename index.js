@@ -2,8 +2,6 @@
 
 'use strict'
 
-const BITLY_MAX_HISTORY_CHUNK = 100
-
 var manifest = require('./package.json'),
     Bitly = require('bitly'),
     app = require('commander'),
@@ -14,6 +12,8 @@ var manifest = require('./package.json'),
     print = console.log.bind( console )
 
 require('colors')
+
+const BITLY_MAX_HISTORY_CHUNK = 100
 
 var domains = {
   default: [
@@ -83,7 +83,7 @@ app
   .option( '--ask', 'ask for Bitly access token (overrides --key)' )
   .option( '--save', 'save Bitly access token (use with --key or --ask)' )
   .option( '--domain <value>', 'preferred Bitly domain for shortening: ' + domains.default.join(', ') )
-  .arguments( '[arg]' )
+  .arguments( '[args]' )
   .allowUnknownOption()
   .parse( process.argv )
 
@@ -91,41 +91,36 @@ applyAltCount( app.rawArgs )
 
 var bitly,
     action = history,
-    arg = app.args[0]
+    arg0 = app.args[0]
 
 if( app.archive ) {
-  if( arg ) {
-    if( !validateURI( arg ) )
-      arg = 'http://bit.ly/' + arg
-
-    action = function() { archive( arg ) }
+  if( arg0 ) {
+    action = archive
   } else
     process.exit( 0 )
-} else if( arg ) {
-  let uri = validateURI( arg )
-
-  if( uri ) {
-    let u = url.parse( uri )
-
-    // If the URL is a bitlink, then send a request to expand it
-    if( domains.default.indexOf( u.hostname ) !== -1 || domains.extended.indexOf( u.hostname ) !== -1 ) {
-      action = function() { expand( uri ) }
-    } else {
-      action = function() { shorten( uri, app.domain ) }
-    }
-  } else
-    action = function() { expand( arg ) }
+} else if( arg0 ) {
+  action = expandOrShorten
 }
 
 getBitlyToken().then( key => {
   bitly = new Bitly( key )
-  action()
+
+  if( arg0 ) {
+    for( var i = 0; i < app.args.length; i++ )
+      // print( app.args[i] )
+      action( app.args[i] )
+  } else {
+    action()
+  }
 }, ( err ) => abort( err ) )
 
-function abort( e ) {
+function warn( e ) {
   if( e )
     print( (e.code ? e + " (code: " + e.code + ")" : e).red )
+}
 
+function abourt( e ) {
+  warn( e )
   process.exit( 1 )
 }
 
@@ -224,6 +219,22 @@ function getBitlyToken() {
   } )
 }
 
+function expandOrShorten( arg ) {
+  let uri = validateURI( arg )
+
+  if( uri ) {
+    let u = url.parse( uri )
+
+    // If the URL is a bitlink, then send a request to expand it
+    if( domains.default.indexOf( u.hostname ) !== -1 || domains.extended.indexOf( u.hostname ) !== -1 ) {
+      expand( arg )
+    } else {
+      shorten( uri, app.domain )
+    }
+  } else
+    expand( arg )
+}
+
 function expand( shortUrl ) {
   bitly.expand( shortUrl ).then( res => {
     let ret = res.data.expand[0]
@@ -235,22 +246,25 @@ function expand( shortUrl ) {
 
 function shorten( longUrl, preferredDomain ) {
   bitly.shorten( longUrl, preferredDomain ).then( res => {
-    print( res.data.url.yellow )
+    print( res.data.url.yellow + " (" + longUrl.grey + ")" )
   } ).catch( e => {
     abort( e )
   } )
 }
 
 function archive( shortUrl ) {
+  if( !validateURI( shortUrl ) )
+    shortUrl = 'http://bit.ly/' + shortUrl
+
   bitly.linkEdit( 'archived', shortUrl, 'true' ).then( res => {
     print( 'Archived: ' + res.data.link_edit.link.yellow )
   } ).catch( e => {
     switch( e.code ) {
       case 400: // INVALID_ARG_LINK, which really means it exists but it's not yours
-        abort( shortUrl + " is not your bitlink" )
+        warn( shortUrl + " is not your bitlink" )
         break
       case 404: // NOT_FOUND
-        abort( shortUrl + " is not yet a bitlink" )
+        warn( shortUrl + " is not yet a bitlink" )
         break
       default:
         abort( e )
