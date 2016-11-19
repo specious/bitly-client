@@ -68,7 +68,8 @@ var domains = {
     'bzfd.it',
     'apne.ws',
     'shebpr.es',
-    'b-gat.es'
+    'b-gat.es',
+    'go.nasa.gov'
   ]
 }
 
@@ -106,7 +107,7 @@ getBitlyToken().then( key => {
   bitly = new Bitly( key )
 
   if( arg0 ) {
-    for( var i = 0; i < app.args.length; i++ )
+    for( let i = 0; i < app.args.length; i++ )
       action( app.args[i] )
   } else {
     action()
