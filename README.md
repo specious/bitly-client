@@ -56,4 +56,4 @@ bitly-client regexplained google-crash facts-about-money
 
 ## License
 
-Licensed under the [MIT License](http://en.wikipedia.org/wiki/MIT_License)
+ISC

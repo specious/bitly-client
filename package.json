@@ -3,7 +3,7 @@
   "version": "1.5.1",
   "description": "Access Bitly from the command line",
   "author": "Ildar Sagdejev <specious@gmail.com> (http://specious.github.io/)",
-  "license": "MIT",
+  "license": "ISC",
   "preferGlobal": true,
   "bin": {
     "bitly-client": "index.js"
