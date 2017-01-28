@@ -41,6 +41,7 @@ var domains = {
     'nyti.ms',
     'n.pr',
     'pep.si',
+    'pdora.co',
     'on.fb.me',
     'on.mtv.com',
     'on.vh1.com',
