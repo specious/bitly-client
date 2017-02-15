@@ -1,6 +1,6 @@
 {
   "name": "bitly-client",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Access Bitly from the command line",
   "author": "Ildar Sagdejev <specious@gmail.com> (http://specious.github.io/)",
   "license": "ISC",

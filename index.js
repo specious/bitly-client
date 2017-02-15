@@ -70,6 +70,7 @@ var domains = {
     'apne.ws',
     'shebpr.es',
     'b-gat.es',
+    'm-gat.es',
     'go.nasa.gov'
   ]
 }
