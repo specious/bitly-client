@@ -54,6 +54,12 @@ Pass multiple arguments:
 bitly-client regexplained google-crash facts-about-money
 ```
 
+Use custom short domain (already configured with Bitly)
+
+```bash
+bitly-client --domain custom_domaim.tld
+```
+
 ## License
 
 ISC
