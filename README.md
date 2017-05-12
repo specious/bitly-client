@@ -54,6 +54,12 @@ Pass multiple arguments:
 bitly-client regexplained google-crash facts-about-money
 ```
 
+Use a different short domain (including a [custom domain](https://support.bitly.com/hc/articles/230558107-What-is-a-Branded-Short-Domain-bsd-and-how-do-I-get-one-) added to your Bitly account):
+
+```
+bitly-client --domain j.mp https://www.bitballoon.com/blog/2014/10/03/five-reasons-you-want-https-for-your-static-site
+```
+
 ## License
 
 ISC
