@@ -1,6 +1,6 @@
 {
   "name": "bitly-client",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "description": "Use Bitly from the command line",
   "author": "Ildar Sagdejev <specious@gmail.com> (http://specious.github.io)",
   "license": "ISC",
@@ -21,7 +21,7 @@
   "dependencies": {
     "bitly": "^3.0.3",
     "colors": "^1.1.2",
-    "commander": "^2.11.0",
+    "safe-commander": "^2.11.0",
     "rc": "^1.2.1",
     "read": "^1.0.7"
   }
