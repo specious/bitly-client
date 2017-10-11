@@ -41,6 +41,7 @@ var domains = {
     'nyti.ms',
     'n.pr',
     'pep.si',
+    'win.gs',
     'pdora.co',
     'on.fb.me',
     'on.mtv.com',
@@ -69,9 +70,11 @@ var domains = {
     'bzfd.it',
     'apne.ws',
     'shebpr.es',
+    'pj.pizza',
     'b-gat.es',
     'm-gat.es',
-    'go.nasa.gov'
+    'go.nasa.gov',
+    'vz.to'
   ]
 }
 

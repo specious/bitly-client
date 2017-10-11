@@ -1,8 +1,8 @@
 {
   "name": "bitly-client",
-  "version": "1.5.3",
-  "description": "Access Bitly from the command line",
-  "author": "Ildar Sagdejev <specious@gmail.com> (http://specious.github.io/)",
+  "version": "1.5.4",
+  "description": "Use Bitly from the command line",
+  "author": "Ildar Sagdejev <specious@gmail.com> (http://specious.github.io)",
   "license": "ISC",
   "preferGlobal": true,
   "bin": {
@@ -21,8 +21,8 @@
   "dependencies": {
     "bitly": "^3.0.3",
     "colors": "^1.1.2",
-    "commander": "^2.9.0",
-    "rc": "^1.1.6",
+    "commander": "^2.11.0",
+    "rc": "^1.2.1",
     "read": "^1.0.7"
   }
 }

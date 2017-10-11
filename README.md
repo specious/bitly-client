@@ -1,6 +1,6 @@
 # bitly-client
 
-Access [Bitly](https://bitly.com/) from the command line ([What is Bitly?](http://support.bitly.com/knowledgebase/articles/77224-what-is-bitly))
+Use [Bitly](https://bitly.com/) from the command line ([What is Bitly?](http://support.bitly.com/knowledgebase/articles/77224-what-is-bitly))
 
 ![bitly-client -c 12](http://specious.github.io/bitly-client/screenshots/bitly-client-1.1.5.png "bitly-client@1.1.5")
 
@@ -58,6 +58,15 @@ Use a different short domain (including a [custom domain](https://support.bitly.
 
 ```
 bitly-client --domain j.mp https://www.bitballoon.com/blog/2014/10/03/five-reasons-you-want-https-for-your-static-site
+```
+
+## Develop
+
+Clone this repository, then run:
+
+```
+yarn install
+./index.js
 ```
 
 ## License
