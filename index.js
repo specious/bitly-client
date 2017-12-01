@@ -26,6 +26,7 @@ var domains = {
     'bitly.is',
     'on.fb.me',
     'amzn.to',
+    'apple.co',
     'urls.im',
     'aol.it',
     'atmlb.com',
@@ -73,7 +74,9 @@ var domains = {
     'pj.pizza',
     'b-gat.es',
     'm-gat.es',
+    'theatln.tc',
     'go.nasa.gov',
+    'red.ht',
     'vz.to'
   ]
 }
