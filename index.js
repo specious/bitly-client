@@ -77,6 +77,7 @@ var domains = {
     'theatln.tc',
     'go.nasa.gov',
     'red.ht',
+    'wef.ch',
     'vz.to'
   ]
 }
