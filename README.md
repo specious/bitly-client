@@ -1,5 +1,7 @@
 # bitly-client
 
+[![Build Status](https://travis-ci.org/specious/bitly-client.svg?branch=master)](https://travis-ci.org/specious/bitly-client)
+
 Use [Bitly](https://bitly.com/) from the command line ([What is Bitly?](http://support.bitly.com/knowledgebase/articles/77224-what-is-bitly))
 
 ![bitly-client -c 12](http://specious.github.io/bitly-client/screenshots/bitly-client-1.1.5.png "bitly-client@1.1.5")

@@ -8,6 +8,9 @@
   "bin": {
     "bitly-client": "index.js"
   },
+  "scripts": {
+    "test": "./index.js --help"
+  },
   "keywords": [
     "bitly",
     "cli"
