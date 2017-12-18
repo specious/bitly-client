@@ -1,6 +1,6 @@
 {
   "name": "bitly-client",
-  "version": "1.5.6",
+  "version": "1.5.7",
   "description": "Create and manage your Bitly shortlinks from the command line",
   "author": "Ildar Sagdejev <specious@gmail.com> (https://git.io/specious)",
   "license": "ISC",
