@@ -62,6 +62,12 @@ Use a different short domain (including a [custom domain](https://support.bitly.
 bitly-client --domain j.mp https://www.bitballoon.com/blog/2014/10/03/five-reasons-you-want-https-for-your-static-site
 ```
 
+Have some fun:
+
+```
+bitly-client have you ever had a dream that you were so sure was real
+```
+
 ## Develop
 
 Clone this repository, then run:
