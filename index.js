@@ -244,6 +244,10 @@ function expandOrShorten( arg ) {
     expand( arg )
 }
 
+function makeHttps( url ) {
+  return url.replace( /^http:/, "https:" )
+}
+
 function expand( shortUrl ) {
   bitly.expand( shortUrl ).then( res => {
     let ret = res.data.expand[0]
@@ -254,7 +258,7 @@ function expand( shortUrl ) {
       else
         warn( "error trying to expand " + shortUrl + ": " + ret.error )
     } else
-      print( (ret.short_url ? ret.short_url : "http://bit.ly/" + ret.hash ).yellow + " > " + ret.long_url.yellow )
+      print( (ret.short_url ? makeHttps( ret.short_url ) : "https://bit.ly/" + ret.hash ).yellow + " > " + ret.long_url.yellow )
   } ).catch( e => {
     warn( e )
   } )
@@ -262,7 +266,7 @@ function expand( shortUrl ) {
 
 function shorten( longUrl, preferredDomain ) {
   bitly.shorten( longUrl, preferredDomain ).then( res => {
-    print( res.data.url.yellow + " (" + longUrl.grey + ")" )
+    print( makeHttps( res.data.url ).yellow + " (" + longUrl.grey + ")" )
   } ).catch( e => {
     warn( e )
   } )
@@ -270,7 +274,7 @@ function shorten( longUrl, preferredDomain ) {
 
 function archive( shortUrl ) {
   if( !validateURI( shortUrl ) )
-    shortUrl = 'http://bit.ly/' + shortUrl
+    shortUrl = 'https://bit.ly/' + shortUrl
 
   bitly.linkEdit( 'archived', shortUrl, 'true' ).then( res => {
     print( 'Archived: ' + res.data.link_edit.link.yellow )
@@ -310,8 +314,10 @@ function printHistory( link_history ) {
   for( let item of link_history ) {
     // Print bitlink followed by original URL
     print( ':: ' +
-      ((item.keyword_link === undefined) ? item.link : item.keyword_link).yellow +
-      ' - ' + item.long_url.red )
+      ( (item.keyword_link === undefined)
+        ? makeHttps( item.link )
+        : makeHttps( item.keyword_link )
+      ).yellow +' - ' + item.long_url.red )
 
     // Print additional details (if "--verbose")
     if( app.optsObj.verbose ) {
