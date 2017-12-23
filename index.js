@@ -94,6 +94,8 @@ app
 
 applyAltCount( app.rawArgs )
 
+app.optsObj.domain = app.optsObj.domain || 'bit.ly'
+
 var bitly,
     action = history,
     arg0 = app.args[0]
