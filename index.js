@@ -314,7 +314,7 @@ function history( offset ) {
 function printHistory( link_history ) {
   for( let item of link_history ) {
     // Print bitlink followed by original URL
-    print( ':: ' +
+    print(
       ( (item.keyword_link === undefined)
         ? makeHttps( item.link )
         : makeHttps( item.keyword_link )
