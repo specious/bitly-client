@@ -257,8 +257,14 @@ function expand( shortUrl ) {
         print( shortUrl.grey + " is not yet a bitlink" )
       else
         warn( "error trying to expand " + shortUrl + ": " + ret.error )
-    } else
-      print( (ret.short_url ? makeHttps( ret.short_url ) : "https://bit.ly/" + ret.hash ).yellow + " > " + ret.long_url.yellow )
+    } else {
+      print(
+        ( ret.short_url
+          ? makeHttps( ret.short_url )
+          : "https://" + app.optsObj.domain + "/" + ret.hash
+        ).yellow + " > " + ret.long_url.yellow
+      )
+    }
   } ).catch( e => {
     warn( e )
   } )
