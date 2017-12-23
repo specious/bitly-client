@@ -50,6 +50,7 @@ var domains = {
     'on.msnbc.com',
     'on.mash.to',
     'oreil.ly',
+    'che.gg',
     'cs.pn',
     'politi.co',
     'tcrn.ch',
