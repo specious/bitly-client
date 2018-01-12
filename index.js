@@ -321,9 +321,9 @@ function printHistory( link_history ) {
     // Print bitlink followed by original URL
     print(
       ( (item.keyword_link === undefined)
-        ? makeHttps( item.link )
-        : makeHttps( item.keyword_link )
-      ).yellow +' - ' + item.long_url.red )
+        ? makeHttps( item.link ).yellow         // item.link is a default named bitlink, e.g. https://j.mp/2p8n9WY
+        : makeHttps( item.keyword_link ).yellow // item.keyword_link is a customized bitlink, like: https://j.mp/a
+      ) +' > ' + item.long_url.red )
 
     // Print additional details (if "--verbose")
     if ( app.optsObj.verbose ) {
