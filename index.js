@@ -100,19 +100,20 @@ var bitly,
     action = history,
     arg0 = app.args[0]
 
-if( app.optsObj.archive ) {
-  if( arg0 ) {
+if ( app.optsObj.archive ) {
+  if ( arg0 ) {
     action = archive
-  } else
+  } else {
     process.exit( 0 )
-} else if( arg0 ) {
+  }
+} else if ( arg0 ) {
   action = expandOrShorten
 }
 
 getBitlyToken().then( key => {
   bitly = new Bitly( key )
 
-  if( arg0 ) {
+  if ( arg0 ) {
     for( let i = 0; i < app.args.length; i++ )
       action( app.args[i] )
   } else {
@@ -121,7 +122,7 @@ getBitlyToken().then( key => {
 }, ( err ) => abort( err ) )
 
 function warn( e ) {
-  if( e )
+  if ( e )
     print( (e.code ? e + " (code: " + e.code + ")" : e).red )
 }
 
@@ -137,12 +138,12 @@ function isQualifiedURI( s ) {
 }
 
 function validateURI( s ) {
-  if( isQualifiedURI( s ) ) {
+  if ( isQualifiedURI( s ) ) {
     return s
   } else {
     s = 'http://' + s
 
-    if( isQualifiedURI( s ) )
+    if ( isQualifiedURI( s ) )
       return s
     else
       return null
@@ -163,7 +164,7 @@ function applyAltCount( args ) {
   for( let i = args.length - 1; i >= 0; i-- ) {
     let arg = args[i], rest = arg.slice( 1 )
 
-    if( arg[0] === "-" && /^\d+$/.test( rest ) ) {
+    if ( arg[0] === "-" && /^\d+$/.test( rest ) ) {
       app.optsObj.count = parseInt( rest )
       break
     }
@@ -193,16 +194,16 @@ function preValidateToken( token ) {
 
 function getBitlyToken() {
   return new Promise( function( resolve, reject ) {
-    if( app.optsObj.ask || (!app.optsObj.key && !preValidateToken( rc.key )) ) {
+    if ( app.optsObj.ask || ( !app.optsObj.key && !preValidateToken( rc.key ) ) ) {
       print( "Please enter your Bitly access token." )
       print( "You can obtain your token from: " + "https://bitly.com/a/oauth_apps".yellow )
       print()
 
       read( { prompt: "Token: " }, function( err, key ) {
         print()
-        if( key !== undefined ) {
+        if ( key !== undefined ) {
           // Save the key if there isn't one saved already, or if --save option is passed
-          if( app.optsObj.save || !rc.key )
+          if ( app.optsObj.save || !rc.key )
             saveConfig( key )
 
           resolve( key )
@@ -210,11 +211,11 @@ function getBitlyToken() {
           reject()
         }
       } )
-    } else if( app.optsObj.key ) {
-      if( !preValidateToken( app.optsObj.key ) ) {
+    } else if ( app.optsObj.key ) {
+      if ( !preValidateToken( app.optsObj.key ) ) {
         reject( 'The authentication token you have provided does not appear to be valid' )
       } else {
-        if( app.optsObj.save )
+        if ( app.optsObj.save )
           saveConfig( app.optsObj.key )
 
         resolve( app.optsObj.key )
@@ -228,11 +229,11 @@ function getBitlyToken() {
 function expandOrShorten( arg ) {
   let uri = validateURI( arg )
 
-  if( uri ) {
+  if ( uri ) {
     let u = url.parse( uri )
 
     // If the URL is a bitlink, then send a request to expand it
-    if( domains.default.indexOf( u.hostname ) !== -1 || domains.extended.indexOf( u.hostname ) !== -1 ) {
+    if ( domains.default.indexOf( u.hostname ) !== -1 || domains.extended.indexOf( u.hostname ) !== -1 ) {
       expand( arg )
     } else {
       shorten( uri, app.optsObj.domain )
@@ -249,8 +250,8 @@ function expand( shortUrl ) {
   bitly.expand( shortUrl ).then( res => {
     let ret = res.data.expand[0]
 
-    if( ret.error ) {
-      if( ret.error === "NOT_FOUND" )
+    if ( ret.error ) {
+      if ( ret.error === "NOT_FOUND" )
         print( shortUrl.grey + " is not yet a bitlink" )
       else
         warn( "error trying to expand " + shortUrl + ": " + ret.error )
@@ -276,7 +277,7 @@ function shorten( longUrl, preferredDomain ) {
 }
 
 function archive( shortUrl ) {
-  if( !validateURI( shortUrl ) )
+  if ( !validateURI( shortUrl ) )
     shortUrl = 'https://bit.ly/' + shortUrl
 
   bitly.linkEdit( 'archived', shortUrl, 'true' ).then( res => {
@@ -299,13 +300,15 @@ function history( offset ) {
   offset = offset || 0
   let count = Math.min( app.optsObj.count, BITLY_MAX_HISTORY_CHUNK )
 
-  if( count !== 0 ) {
+  if ( count !== 0 ) {
     app.optsObj.count -= count
 
-    bitly._doRequest( bitly._generateNiceUrl( { offset, limit: count }, 'user/link_history' ) ).then( res => {
+    bitly._doRequest(
+      bitly._generateNiceUrl( { offset, limit: count }, 'user/link_history' )
+    ).then( res => {
       printHistory( res.data.link_history )
 
-      if( offset + count < res.data.result_count )
+      if ( offset + count < res.data.result_count )
         history( offset + count )
     } ).catch( e => {
       abort( e )
@@ -314,7 +317,7 @@ function history( offset ) {
 }
 
 function printHistory( link_history ) {
-  for( let item of link_history ) {
+  for ( let item of link_history ) {
     // Print bitlink followed by original URL
     print(
       ( (item.keyword_link === undefined)
@@ -323,12 +326,12 @@ function printHistory( link_history ) {
       ).yellow +' - ' + item.long_url.red )
 
     // Print additional details (if "--verbose")
-    if( app.optsObj.verbose ) {
+    if ( app.optsObj.verbose ) {
       const INDENT = '     '
 
-      if( item.title !== "" )
-        print( INDENT + item.title.replace(/(\r\n|\n|\r)/gm, "") )
-      if( item.tags.length !== 0 )
+      if ( item.title !== "" )
+        print( INDENT + item.title.replace( /(\r\n|\n|\r)/gm, "") )
+      if ( item.tags.length !== 0 )
         print( INDENT + 'Tags: '.red + item.tags.join(', ').yellow )
 
       print( INDENT + 'Created: '.red + new Date(item.created_at * 1000) + "\n" )
