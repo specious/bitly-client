@@ -94,8 +94,6 @@ app
 
 applyAltCount( app.rawArgs )
 
-app.optsObj.domain = app.optsObj.domain || 'bit.ly'
-
 var bitly,
     action = history,
     arg0 = app.args[0]
@@ -226,6 +224,24 @@ function getBitlyToken() {
   } )
 }
 
+function makeHttps( url ) {
+  return url.replace( /^http:/, "https:" )
+}
+
+function replaceDomain( url, desiredDomain ) {
+  return url.replace( /:\/\/(.*?)\//, "://" + desiredDomain + "/" )
+}
+
+function normalizeLink( url ) {
+  return app.optsObj.domain
+    ? makeHttps( replaceDomain( url, app.optsObj.domain ) )
+    : makeHttps( url )
+}
+
+function shortLinkFromKey( key ) {
+  return "https://" + (app.optsObj.domain || "bit.ly") + "/" + key
+}
+
 function expandOrShorten( arg ) {
   let uri = validateURI( arg )
 
@@ -242,10 +258,6 @@ function expandOrShorten( arg ) {
     expand( arg )
 }
 
-function makeHttps( url ) {
-  return url.replace( /^http:/, "https:" )
-}
-
 function expand( shortUrl ) {
   bitly.expand( shortUrl ).then( res => {
     let ret = res.data.expand[0]
@@ -258,8 +270,8 @@ function expand( shortUrl ) {
     } else {
       print(
         ( ret.short_url
-          ? makeHttps( ret.short_url )
-          : "https://" + app.optsObj.domain + "/" + ret.hash
+          ? normalizeLink( ret.short_url )
+          : shortLinkFromKey( ret.hash )
         ).yellow + " > " + ret.long_url.yellow
       )
     }
@@ -278,7 +290,7 @@ function shorten( longUrl, preferredDomain ) {
 
 function archive( shortUrl ) {
   if ( !validateURI( shortUrl ) )
-    shortUrl = 'https://bit.ly/' + shortUrl
+    shortUrl = shortLinkFromKey( shortUrl )
 
   bitly.linkEdit( 'archived', shortUrl, 'true' ).then( res => {
     print( 'Archived: ' + res.data.link_edit.link.yellow )
@@ -321,8 +333,8 @@ function printHistory( link_history ) {
     // Print bitlink followed by original URL
     print(
       ( (item.keyword_link === undefined)
-        ? makeHttps( item.link ).yellow         // item.link is a default named bitlink, e.g. https://j.mp/2p8n9WY
-        : makeHttps( item.keyword_link ).yellow // item.keyword_link is a customized bitlink, like: https://j.mp/a
+        ? normalizeLink( item.link ).yellow         // item.link is a default named bitlink, e.g. https://j.mp/2p8n9WY
+        : normalizeLink( item.keyword_link ).yellow // item.keyword_link is a customized bitlink, like: https://j.mp/a
       ) +' > ' + item.long_url.red )
 
     // Print additional details (if "--verbose")
