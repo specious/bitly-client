@@ -63,6 +63,7 @@ var domains = {
     'lat.ms',
     'ind.pn',
     'es.pn',
+    'chn.ge',
     'engt.co',
     'bzfd.it',
     'shebpr.es',
