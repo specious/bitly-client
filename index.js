@@ -282,31 +282,33 @@ function expand( shortUrl ) {
 }
 
 function shorten( longUrl, preferredDomain ) {
-  bitly.shorten( longUrl, preferredDomain ).then( res => {
-    print( makeHttps( res.data.url ).yellow + " (" + longUrl.grey + ")" )
-  } ).catch( e => {
-    warn( e )
-  } )
+  bitly.shorten( longUrl, preferredDomain )
+    .then( res => {
+      print( makeHttps( res.url ).yellow + " (" + longUrl.grey + ")" )
+    } )
+    .catch(warn)
 }
 
 function archive( shortUrl ) {
   if ( !validateURI( shortUrl ) )
     shortUrl = shortLinkFromKey( shortUrl )
 
-  bitly.linkEdit( 'archived', shortUrl, 'true' ).then( res => {
-    print( 'Archived: ' + res.data.link_edit.link.yellow )
-  } ).catch( e => {
-    switch( e.code ) {
-      case 400: // INVALID_ARG_LINK, which really means it exists but it's not yours
-        warn( shortUrl + " is not your bitlink" )
-        break
-      case 404: // NOT_FOUND
-        warn( shortUrl + " is not yet a bitlink" )
-        break
-      default:
-        abort( e )
-    }
-  } )
+  bitly.linkEdit( 'archived', shortUrl, 'true' )
+    .then( res => {
+      print( 'Archived: ' + res.data.link_edit.link.yellow )
+    } )
+    .catch( e => {
+      switch( e.code ) {
+        case 400: // INVALID_ARG_LINK, which really means it exists but it's not yours
+          warn( shortUrl + " is not your bitlink" )
+          break
+        case 404: // NOT_FOUND
+          warn( shortUrl + " is not yet a bitlink" )
+          break
+        default:
+          abort( e )
+      }
+    } )
 }
 
 function history( offset ) {
@@ -316,16 +318,14 @@ function history( offset ) {
   if ( count !== 0 ) {
     app.optsObj.count -= count
 
-    bitly._doRequest(
-      bitly._generateNiceUrl( { offset, limit: count }, 'user/link_history' )
-    ).then( res => {
-      printHistory( res.data.link_history )
+    bitly._doRequest( bitly._generateNiceUrl( { offset, limit: count }, 'user/link_history' ))
+      .then( res => {
+        printHistory( res.data.link_history )
 
-      if ( offset + count < res.data.result_count )
-        history( offset + count )
-    } ).catch( e => {
-      abort( e )
-    } )
+        if ( offset + count < res.data.result_count )
+          history( offset + count )
+      } )
+      .catch(abort)
   }
 }
 
