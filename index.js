@@ -3,7 +3,7 @@
 'use strict'
 
 var manifest = require('./package.json'),
-    Bitly = require('bitly'),
+    { BitlyClient } = require('bitly'),
     app = require('safe-commander'),
     rc = require('rc')(manifest.name),
     homedir = require('os').homedir(),
@@ -110,7 +110,7 @@ if ( app.optsObj.archive ) {
 }
 
 getBitlyToken().then( key => {
-  bitly = new Bitly( key )
+  bitly = new BitlyClient( key )
 
   if ( arg0 ) {
     for( let i = 0; i < app.args.length; i++ )
