@@ -125,7 +125,7 @@ function warn( e ) {
     print( (e.code ? e + " (code: " + e.code + ")" : e).red )
 }
 
-function abourt( e ) {
+function abort( e ) {
   warn( e )
   process.exit( 1 )
 }
