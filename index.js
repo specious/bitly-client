@@ -3,7 +3,7 @@
 'use strict'
 
 var manifest = require('./package.json'),
-    Bitly = require('bitly'),
+    { BitlyClient } = require('bitly'),
     app = require('safe-commander'),
     rc = require('rc')(manifest.name),
     homedir = require('os').homedir(),
@@ -110,7 +110,7 @@ if ( app.optsObj.archive ) {
 }
 
 getBitlyToken().then( key => {
-  bitly = new Bitly( key )
+  bitly = new BitlyClient( key )
 
   if ( arg0 ) {
     for( let i = 0; i < app.args.length; i++ )
@@ -261,7 +261,7 @@ function expandOrShorten( arg ) {
 
 function expand( shortUrl ) {
   bitly.expand( shortUrl ).then( res => {
-    let ret = res.data.expand[0]
+    let ret = res.expand[0]
 
     if ( ret.error ) {
       if ( ret.error === "NOT_FOUND" )
@@ -283,7 +283,7 @@ function expand( shortUrl ) {
 
 function shorten( longUrl, preferredDomain ) {
   bitly.shorten( longUrl, preferredDomain ).then( res => {
-    print( makeHttps( res.data.url ).yellow + " (" + longUrl.grey + ")" )
+    print( makeHttps( res.url ).yellow + " (" + longUrl.grey + ")" )
   } ).catch( e => {
     warn( e )
   } )
@@ -293,8 +293,15 @@ function archive( shortUrl ) {
   if ( !validateURI( shortUrl ) )
     shortUrl = shortLinkFromKey( shortUrl )
 
-  bitly.linkEdit( 'archived', shortUrl, 'true' ).then( res => {
-    print( 'Archived: ' + res.data.link_edit.link.yellow )
+  bitly.bitlyRequest(
+    'user/link_edit',
+    {
+      link: shortUrl,
+      edit: 'archived',
+      archived: 'true'
+    }
+  ).then( res => {
+    print( 'Archived: ' + res.link_edit.link.yellow )
   } ).catch( e => {
     switch( e.code ) {
       case 400: // INVALID_ARG_LINK, which really means it exists but it's not yours
@@ -316,12 +323,16 @@ function history( offset ) {
   if ( count !== 0 ) {
     app.optsObj.count -= count
 
-    bitly._doRequest(
-      bitly._generateNiceUrl( { offset, limit: count }, 'user/link_history' )
+    bitly.bitlyRequest(
+      'user/link_history',
+      {
+        offset,
+        limit: count
+      }
     ).then( res => {
-      printHistory( res.data.link_history )
+      printHistory( res.link_history )
 
-      if ( offset + count < res.data.result_count )
+      if ( offset + count < res.result_count )
         history( offset + count )
     } ).catch( e => {
       abort( e )
