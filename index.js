@@ -118,11 +118,15 @@ getBitlyToken().then( key => {
   } else {
     action()
   }
-}, ( err ) => abort( err ) )
+}, ( e ) => abort( e ) )
 
 function warn( e ) {
-  if ( e )
-    print( (e.code ? e + " (code: " + e.code + ")" : e).red )
+  if ( e ) {
+    if ( app.verbose )
+      print( e.stack )
+    else
+      print( e.message + " " + ("(" + e.name + ")").red )
+  }
 }
 
 function abort( e ) {
