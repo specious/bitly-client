@@ -4,7 +4,7 @@
 
 var manifest = require('./package.json'),
     { BitlyClient } = require('bitly'),
-    app = require('safe-commander'),
+    app = require('commander'),
     rc = require('rc')(manifest.name),
     homedir = require('os').homedir(),
     url = require('url'),
@@ -99,7 +99,7 @@ var bitly,
     action = history,
     arg0 = app.args[0]
 
-if ( app.optsObj.archive ) {
+if ( app.archive ) {
   if ( arg0 ) {
     action = archive
   } else {
@@ -164,7 +164,7 @@ function applyAltCount( args ) {
     let arg = args[i], rest = arg.slice( 1 )
 
     if ( arg[0] === "-" && /^\d+$/.test( rest ) ) {
-      app.optsObj.count = parseInt( rest )
+      app.count = parseInt( rest )
       break
     }
   }
@@ -193,7 +193,7 @@ function preValidateToken( token ) {
 
 function getBitlyToken() {
   return new Promise( function( resolve, reject ) {
-    if ( app.optsObj.ask || ( !app.optsObj.key && !preValidateToken( rc.key ) ) ) {
+    if ( app.ask || ( !app.key && !preValidateToken( rc.key ) ) ) {
       print( "Please enter your Bitly access token." )
       print( "You can obtain your token from: " + "https://bitly.com/a/oauth_apps".yellow )
       print()
@@ -202,7 +202,7 @@ function getBitlyToken() {
         print()
         if ( key !== undefined ) {
           // Save the key if there isn't one saved already, or if --save option is passed
-          if ( app.optsObj.save || !rc.key )
+          if ( app.save || !rc.key )
             saveConfig( key )
 
           resolve( key )
@@ -210,14 +210,14 @@ function getBitlyToken() {
           reject()
         }
       } )
-    } else if ( app.optsObj.key ) {
-      if ( !preValidateToken( app.optsObj.key ) ) {
+    } else if ( app.key ) {
+      if ( !preValidateToken( app.key ) ) {
         reject( 'The authentication token you have provided does not appear to be valid' )
       } else {
-        if ( app.optsObj.save )
-          saveConfig( app.optsObj.key )
+        if ( app.save )
+          saveConfig( app.key )
 
-        resolve( app.optsObj.key )
+        resolve( app.key )
       }
     } else {
       resolve( rc.key )
@@ -234,13 +234,13 @@ function replaceDomain( url, desiredDomain ) {
 }
 
 function normalizeLink( url ) {
-  return app.optsObj.domain
-    ? makeHttps( replaceDomain( url, app.optsObj.domain ) )
+  return app.domain
+    ? makeHttps( replaceDomain( url, app.domain ) )
     : makeHttps( url )
 }
 
 function shortLinkFromKey( key ) {
-  return "https://" + (app.optsObj.domain || "bit.ly") + "/" + key
+  return "https://" + (app.domain || "bit.ly") + "/" + key
 }
 
 function expandOrShorten( arg ) {
@@ -253,7 +253,7 @@ function expandOrShorten( arg ) {
     if ( domains.default.indexOf( u.hostname ) !== -1 || domains.extended.indexOf( u.hostname ) !== -1 ) {
       expand( arg )
     } else {
-      shorten( uri, app.optsObj.domain )
+      shorten( uri, app.domain )
     }
   } else
     expand( arg )
@@ -318,10 +318,10 @@ function archive( shortUrl ) {
 
 function history( offset ) {
   offset = offset || 0
-  let count = Math.min( app.optsObj.count, BITLY_MAX_HISTORY_CHUNK )
+  let count = Math.min( app.count, BITLY_MAX_HISTORY_CHUNK )
 
   if ( count !== 0 ) {
-    app.optsObj.count -= count
+    app.count -= count
 
     bitly.bitlyRequest(
       'user/link_history',
@@ -350,7 +350,7 @@ function printHistory( link_history ) {
       ) +' > ' + item.long_url.red )
 
     // Print additional details (if "--verbose")
-    if ( app.optsObj.verbose ) {
+    if ( app.verbose ) {
       const INDENT = '     '
 
       if ( item.title !== "" )
