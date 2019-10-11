@@ -277,7 +277,7 @@ function expand( shortUrl ) {
         ( ret.short_url
           ? normalizeLink( ret.short_url )
           : shortLinkFromKey( ret.hash )
-        ).yellow + " > " + ret.long_url.yellow
+        ).yellow + " > " + encodeURI(ret.long_url).yellow
       )
     }
   } ).catch( e => {
@@ -351,7 +351,7 @@ function printHistory( link_history ) {
       ( (item.keyword_link === undefined)
         ? normalizeLink( item.link ).yellow         // item.link is a default named bitlink, e.g. https://j.mp/2p8n9WY
         : normalizeLink( item.keyword_link ).yellow // item.keyword_link is a customized bitlink, like: https://j.mp/a
-      ) +' > ' + item.long_url.red )
+      ) +' > ' + encodeURI(item.long_url).red )
 
     // Print additional details (if "--verbose")
     if ( app.verbose ) {
