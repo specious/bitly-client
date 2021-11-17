@@ -31,7 +31,6 @@ var domains = {
     'amzn.to',
     'ebay.to',
     'apple.co',
-    'urls.im',
     'aol.it',
     'atmlb.com',
     'bbc.in',
@@ -40,7 +39,6 @@ var domains = {
     'bloom.bg',
     'buff.ly',
     'cnet.co',
-    'huff.to',
     'lat.ms',
     'nyr.kr',
     'nyti.ms',
@@ -52,8 +50,6 @@ var domains = {
     'on.mtv.com',
     'on.vh1.com',
     'on.msnbc.com',
-    'on.mash.to',
-    'oreil.ly',
     'che.gg',
     'cs.pn',
     'politi.co',
@@ -76,9 +72,7 @@ var domains = {
     'pj.pizza',
     'b-gat.es',
     'm-gat.es',
-    'theatln.tc',
     'go.nasa.gov',
-    '1.usa.gov',
     'red.ht',
     'wef.ch',
     'vz.to'
@@ -131,16 +125,12 @@ if (opts.archive) {
     } else {
       await action()
     }
-  } catch(e) { error(e) }
+  } catch(code) { abort('Bitly service returned: ' + code) }
 })()
 
 function abort(msg) {
   print(c.red(msg))
   process.exit(1)
-}
-
-function error(code) {
-  abort('Bitly service returned: ' + code)
 }
 
 function parseCount(n) {
@@ -167,22 +157,28 @@ function findCountValue(args) {
   return args
 }
 
+async function ask(msg) {
+  let prompt = readline.createInterface({ input: process.stdin, output: process.stdout })
+
+  prompt.question[promisify.custom] = (question) => {
+    return new Promise(
+      resolve => prompt.question(question, resolve)
+    )
+  }
+
+  let answer = (await promisify(prompt.question)(msg)).trim()
+  prompt.close()
+
+  return answer
+}
+
 async function getAccessToken() {
   if (opts.ask || (!opts.key && !tokenLooksRealistic(rc.key))) {
     print("Please enter your Bitly access token.")
     print("Get an API access token here:", c.yellow("https://app.bitly.com/settings/api/"))
     print()
 
-    let prompt = readline.createInterface({ input: process.stdin, output: process.stdout })
-
-    prompt.question[promisify.custom] = (question) => {
-      return new Promise(
-        resolve => prompt.question(question, resolve)
-      )
-    }
-
-    let key = (await promisify(prompt.question)("Access token: ")).trim()
-    prompt.close()
+    let key = await ask("Access token: ")
     print()
 
     if (tokenLooksRealistic(key)) {
@@ -241,14 +237,14 @@ async function request(method, endpoint, data) {
         body: data ? JSON.stringify(data) : undefined
       }
     )
-  } catch(e) { abort(e) }
+  } catch(e) { abort('Request failed: ' + e) }
 
   if (res.status >= 300)
     throw res.status
 
   try {
     res = await res.json()
-  } catch(e) { error(e) }
+  } catch(e) { abort('Invalid response: ' + e) }
 
   return res
 }
